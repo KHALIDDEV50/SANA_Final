@@ -293,3 +293,252 @@ Business diagrams (business model canvas, target audience, SWOT, competitor anal
 | GET / POST / PUT / DELETE | `/api/v1/change-proposal/{get\|add\|update\|delete}/…` | Raw AI proposals |
 | GET / POST / PUT / DELETE | `/api/v1/change-proposal-item/{get\|add\|update\|delete}/…` | Raw proposal changes |
 | GET / POST / PUT / DELETE | `/api/v1/tool-run/{get\|add\|update\|delete}/…` | Raw tool-run records |
+
+
+===================================khalid==================================
+SANA — Backend Contributions
+This document describes my backend contributions to SANA: Business domain integration, Moyasar sandbox billing, and registration welcome emails through n8n.
+
+It is scoped to these contributions and does not document the entire team's backend or any frontend implementation.
+1. Business Domain
+Integrated the five Business analysis tools with the shared AI request lifecycle.
+Business tool	Diagram type
+BUSINESS_MODEL_BUILDER	BUSINESS_MODEL_CANVAS
+TARGET_AUDIENCE_BUILDER	TARGET_AUDIENCE
+SWOT_ANALYZER	SWOT
+COMPETITOR_ANALYSIS	COMPETITOR_ANALYSIS
+RISK_ANALYZER	RISK_ANALYSIS
+
+
+Capabilities
+- Submit Business requests through the backend to n8n.
+- Track asynchronous execution and retrieve request status.
+- Receive AI results through the shared n8n callback integration.
+- Distinguish advice, clarification, and diagram proposals.
+- Store structured analytical reports in execution history.
+- Keep proposed diagram changes pending until user acceptance.
+- Store accepted diagrams using the existing project output, node, and edge models.
+- Enforce project ownership checks for project-scoped operations.
+- Use graph revisions to reject changes based on an outdated diagram.
+Request Flow
+1. An authenticated user submits a request for their project.
+2. Spring Boot prepares the request and supplied project context.
+3. n8n executes the AI workflow.
+4. n8n sends the result back to the backend.
+5. The client retrieves the updated request status.
+6. A diagram proposal requires user acceptance before its changes are applied.
+AI instructions and output formatting are managed in n8n. Spring Boot owns persistence, authorization, request tracking, and proposal handling.
+Main API Routes
+Method	Route	Purpose
+POST	/api/business/tools	Submit a Business tool request
+POST	/api/projects/{projectId}/ai/requests	Submit a diagram or advice request
+GET	/api/projects/{projectId}/ai/requests/{requestId}	Retrieve request status and result
+POST	/api/integrations/n8n/ai/callback	Receive the protected n8n callback
+
+
+These routes use their corresponding request DTOs; the Business tools endpoint and the general AI endpoint do not have interchangeable request bodies.
+Independent Business Analysis Requests
+Each Business analysis tool can be requested independently through the shared endpoint below. These are separate tool executions selected by toolType, not five different URL routes. They produce analytical reports rather than CREATE diagram proposals.
+POST /api/business/tools
+Content-Type: application/json
+Authentication: use the authenticated user's registered email and password with HTTP Basic. Do not send the n8n integration keys from the client.
+Analysis	Method	Endpoint	toolType
+Business Model Builder	POST	/api/business/tools	BUSINESS_MODEL_BUILDER
+Target Audience Builder	POST	/api/business/tools	TARGET_AUDIENCE_BUILDER
+SWOT Analyzer	POST	/api/business/tools	SWOT_ANALYZER
+Competitor Analysis	POST	/api/business/tools	COMPETITOR_ANALYSIS
+Risk Analyzer	POST	/api/business/tools	RISK_ANALYZER
+
+
+Example Request
+{
+  "projectId": 5,
+  "toolType": "BUSINESS_MODEL_BUILDER",
+  "inputJson": "{\"projectName\":\"حمل\",\"description\":\"منصة وتطبيق لتسهيل طلب نقل البضائع\",\"stage\":\"فكرة قيد الدراسة\",\"assumptions\":[\"استهداف الأفراد والمتاجر الصغيرة والمتوسطة\"],\"unknowns\":[\"التسعير\",\"تكاليف الرحلات\",\"آلية توفير الناقلين\",\"استعداد العملاء للدفع\"]}",
+  "outputId": 3,
+  "baseRevision": 0
+}
+The IDs and revision above are illustrative. Use a project and output owned by the authenticated user and the output's actual current revision. Whether outputId is required depends on the deployed BusinessToolRequestDTO; the earlier DTO required it. Independent execution means that tools do not require running the other four tools first.
+
+To run another analysis, replace only toolType with the corresponding value from the table and supply the relevant input. Competitor analysis should include sourced competitor information when available; missing data must not be replaced with fabricated facts.
+
+inputJson is a string containing valid JSON, not a nested JSON object. The outer request must escape quotation marks inside this string.
+Retrieve the Result
+The current integration returns HTTP 202 with an AIRunResponseDTO containing request metadata, rather than the final report synchronously. Use the returned statusUrl to retrieve the result:
+GET /api/projects/{projectId}/ai/requests/{requestId}
+- PENDING or RUNNING: execution has not finished.
+- COMPLETED: inspect result. A structured report is returned as an ADVICE result with the serialized report in message; a genuine clarification may be returned instead.
+- FAILED or TIMED_OUT: inspect the error and investigate the workflow before retrying.
+For a structured report, preserve the complete JSON report when parsing result.message; do not keep only executiveSummary. Each tool's report follows its own schema. Analytical reports do not require accepting a graph proposal and must not modify the current graph.
+
+This documents the current asynchronous n8n integration. It does not reintroduce the former direct ChatClient execution path or claim that obsolete routes are still available.
+Example: Create a Business Model Diagram
+POST /api/projects/{projectId}/ai/requests
+{
+  "task": "CREATE",
+  "diagramType": "BUSINESS_MODEL_CANVAS",
+  "prompt": "أنشئ نموذج عمل تجاري بناءً على وصف المشروع. وضّح الافتراضات ولا تخترع بيانات سوقية، واستخدم أنواع العناصر والعلاقات المسموحة في السياق."
+}
+Use an existing project owned by the authenticated user. A queued response confirms submission; inspect the status URL to verify completion.
+2. Moyasar Sandbox Billing
+Implemented backend billing for the three SANA plans.
+Plan code	Display name	Price	Project limit
+SPARK	شرارة	Free	1
+GLOW	وهج	SAR 29 per monthly period	10
+HORIZON	أفق	SAR 79 per monthly period	Unlimited
+
+
+Amounts are stored and exchanged in halalas: 2900 for GLOW and 7900 for HORIZON.
+Capabilities
+- Retrieve the plan catalog and current user membership.
+- Create a Moyasar sandbox checkout invoice.
+- Retrieve the authenticated user's recent order history.
+- Verify payment status server-side using Moyasar.
+- Activate a paid membership only after payment verification.
+- Prevent repeated verification from extending the same membership twice.
+- Enforce project creation limits according to the effective membership.
+- Reject a new paid checkout while a paid membership is active.
+- Fall back to the free plan's effective limits when a paid period expires.
+Billing API
+All routes require authentication except the payment notification callback.
+Method	Route	Purpose
+GET	/api/billing/plans	Retrieve the plan catalog
+GET	/api/billing/me	Retrieve current membership and project usage
+GET	/api/billing/orders	Retrieve the user's recent orders
+POST	/api/billing/checkout	Create a checkout invoice
+POST	/api/billing/reconcile	Retrieve payment status from Moyasar and update membership
+POST	/api/billing/callbacks/{orderId}/{token}	Process a protected payment notification
+
+
+Checkout request:
+{
+  "planCode": "GLOW"
+}
+The response contains an order ID, a checkout URL, and the test-mode flag. A checkout URL alone does not mean payment has succeeded.
+Payment Verification
+- The callback uses an unguessable per-order token.
+- The backend retrieves the invoice from Moyasar before changing membership.
+- Invoice identity, amount, and currency must match the stored order.
+- Payment status is not trusted from browser redirects or callback request bodies.
+- Notification processing is idempotent for an already applied payment.
+Main Billing Files
+- Config/BillingProperties.java
+- Config/BillingConfig.java
+- Enums/BillingPlan.java
+- Model/BillingAccount.java
+- Model/BillingOrder.java
+- Repository/BillingAccountRepository.java
+- Repository/BillingOrderRepository.java
+- DTO/Billing/BillingDTOs.java
+- Service/Billing/BillingGateway.java
+- Service/Billing/MoyasarGateway.java
+- Service/Billing/BillingStore.java
+- Service/Billing/BillingService.java
+- Controller/BillingController.java
+Existing security configuration, user and project repositories, and ProjectService were extended to support billing callbacks and project quotas.
+Billing Limitations
+- The integration is restricted to Moyasar test mode.
+- Renewal is manual; automatic recurring charging is not implemented.
+- Upgrades or renewals during an active paid period are rejected.
+- Refund or reversal handling requires a subsequent verification; no scheduled refund polling is implemented.
+- Billing verification can also be triggered through the reconcile endpoint.
+3. Registration Welcome Emails
+Connected successful user registration to a separate n8n email workflow.
+Registration Flow
+1. AuthService validates the account and hashes the password.
+2. The user is saved within a database transaction.
+3. A UserRegisteredEvent is published.
+4. RegistrationNotificationService handles the event after the transaction commits.
+5. The service sends the registration notification to n8n.
+6. n8n sends an Arabic HTML welcome email using the configured SMTP account.
+Files Added or Updated
+File	Change
+DTO/Notification/UserRegisteredEvent.java	Added a registration event containing user ID, name, and email
+Service/RegistrationNotificationService.java	Added the authenticated n8n notification request
+Service/AuthService.java	Added transactional registration and event publication
+application.properties	Added notification environment-variable mappings
+
+
+Notification Payload
+{
+  "eventType": "USER_REGISTERED",
+  "userId": 4,
+  "name": "Example User",
+  "email": "user@example.com"
+}
+Passwords and password hashes are never included in the notification payload.
+n8n Workflow
+- A separate POST webhook receives registration events.
+- Header authentication uses X-Sana-Notification-Key.
+- The Send an Email node sends the HTML welcome message.
+- The HTML template follows SANA's Arabic RTL presentation and cream, teal, and gold colors.
+- Production registration uses the published production webhook URL, not the temporary test URL.
+SMTP credentials, including the Gmail app password, remain inside n8n.
+Email Delivery Behavior
+- A failed notification does not undo successful registration.
+- The backend uses bounded connection and request timeouts.
+- The current listener runs synchronously after commit; the notification call may add up to five seconds.
+- Automatic retries and a durable notification outbox are not implemented.
+- A successful webhook response confirms n8n acceptance, not email delivery.
+- This is a welcome email, not an email ownership verification mechanism.
+4. Configuration
+Keep secrets in environment variables and do not commit their values.
+Shared n8n AI Integration
+sana.n8n.business-enabled=true
+sana.n8n.webhook-url=${N8N_AI_WEBHOOK_URL:}
+sana.n8n.request-key=${N8N_AI_WEBHOOK_KEY:}
+sana.n8n.callback-key=${N8N_AI_CALLBACK_KEY:}
+The AI request and callback keys must be different.
+Billing
+sana.billing.enabled=${SANA_BILLING_ENABLED:false}
+sana.billing.test-mode=${SANA_BILLING_TEST_MODE:true}
+sana.billing.secret-key=${MOYASAR_SECRET_KEY:}
+sana.billing.public-base-url=${SANA_PUBLIC_BASE_URL:}
+sana.billing.frontend-base-url=${SANA_FRONTEND_BASE_URL:}
+When enabled, billing requires a Moyasar test secret key and valid public HTTPS origins. The return URL setting is required by the checkout integration; no frontend implementation is included in this document.
+Registration Notifications
+sana.notifications.enabled=${SANA_NOTIFICATIONS_ENABLED:false}
+sana.notifications.webhook-url=${N8N_NOTIFICATIONS_WEBHOOK_URL:}
+sana.notifications.request-key=${N8N_NOTIFICATIONS_KEY:}
+Required notification environment variables:
+SANA_NOTIFICATIONS_ENABLED=true
+N8N_NOTIFICATIONS_WEBHOOK_URL=https://YOUR_N8N_HOST/webhook/sana/user-registered
+N8N_NOTIFICATIONS_KEY=YOUR_PRIVATE_NOTIFICATION_KEY
+Use separate credentials for AI requests, AI callbacks, notifications, and Moyasar.
+5. Authentication
+User-facing project and billing requests use the project's existing authentication and ownership rules. For local Postman testing, use HTTP Basic with the registered email and password.
+
+Registration remains public:
+POST /api/v1/auth/register
+Content-Type: application/json
+{
+  "name": "Example User",
+  "email": "user@example.com",
+  "passwordHash": "ReplaceWithYourTestPassword"
+}
+Despite its existing name, passwordHash accepts the registration password; AuthService hashes it before persistence. Use a new email address for each registration test.
+6. Verification Completed
+The following behaviors were confirmed during manual testing.
+Business and Graph Persistence
+- Added, retrieved, updated, and deleted diagram elements.
+- Created and updated relationships between nodes.
+- Rejected unsupported node types.
+- Rejected stale graph revisions without applying changes.
+- Rejected references to a deleted node.
+- Verified unauthenticated and unauthorized project access handling.
+- Retrieved completed AI advice and accepted diagram proposals.
+Billing Sandbox
+- Retrieved the plan catalog and free membership.
+- Created and paid a sandbox GLOW invoice.
+- Verified membership activation with a project limit of 10.
+- Confirmed the order was stored as PAID.
+- Repeated reconciliation without changing the existing subscription end time.
+- Rejected another paid checkout during the active subscription.
+- Confirmed that rejection did not create another order.
+Welcome Email
+- Tested the protected notification webhook from Postman.
+- Confirmed receipt of the HTML welcome email.
+- Registered a user through Spring Boot and confirmed the integrated welcome email flow.
+These checks document the tested paths; they do not constitute live-payment certification or complete verification of every application feature.
+7. Scope Exclusions
+- Frontend components, styling, screens, and setup instructions.
