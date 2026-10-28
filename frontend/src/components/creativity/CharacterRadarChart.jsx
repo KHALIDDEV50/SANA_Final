@@ -1,0 +1,13 @@
+import React,{useEffect,useState} from 'react';
+import {tr} from '../../lib/i18n';
+const axes=['attack','defense','speed','rangeStat','stamina','special'],colors=['#0D7F86','#B48134','#7A5AA8'];
+const point=(i,r)=>[180+Math.sin(i*Math.PI/3)*r,174-Math.cos(i*Math.PI/3)*r];
+export default function CharacterRadarChart({fighters,lang}){
+ const [selected,setSelected]=useState([]);
+ const [initialized,setInitialized]=useState(false);
+ const ids=fighters.map(f=>String(f.id??f.characterId));
+ useEffect(()=>{if(!initialized&&ids.length){setSelected(ids.slice(0,2));setInitialized(true)}else if(initialized){setSelected(previous=>previous.filter(id=>ids.includes(id)))}},[ids.join('|'),initialized]);
+ const t=k=>tr(lang,k),shown=fighters.filter(f=>selected.includes(String(f.id??f.characterId))).slice(0,3);
+ const polygon=r=>axes.map((_,i)=>point(i,r).join(',')).join(' ');
+ return <section className="spark-radar sana-creative-radar"><div className="sana-radar-heading"><span aria-hidden="true">✦</span><h2>{t('characterComparison')}</h2></div><p>{t('radarHelp')}</p><div className="spark-compare-picker" role="group" aria-label={t('characterComparison')}>{fighters.map(f=>{const id=String(f.id??f.characterId);return <label key={id}><input type="checkbox" checked={selected.includes(id)} disabled={!selected.includes(id)&&selected.length===3} onChange={e=>setSelected(s=>e.target.checked?[...s,id]:s.filter(x=>x!==id))}/>{f.name}</label>})}</div><svg className="sana-radar-visual" viewBox="0 0 360 355" role="img" aria-label={t('characterComparison')}><title>{t('radarHelp')}</title>{[2,4,6,8,10].map(n=><g key={n}><polygon points={polygon(n*11)} fill="none" stroke="#cfe0da"/><text x="184" y={174-n*11} fontSize="10" fill="#5d7477">{n}</text></g>)}{axes.map((k,i)=>{const [x,y]=point(i,110),[tx,ty]=point(i,143);return <g key={k}><path d={`M180 174L${x} ${y}`} stroke="#cfe0da"/><text x={tx} y={ty} textAnchor="middle" fontSize="12" fill="#153840">{t(k)}</text></g>})}{shown.map((f,j)=>axes.every(k=>f[k]!=null&&Number.isFinite(Number(f[k])))&&<polygon key={f.id??f.characterId} points={axes.map((k,i)=>point(i,Math.max(0,Math.min(10,Number(f[k])))*11).join(',')).join(' ')} fill={colors[j]} fillOpacity=".16" stroke={colors[j]} strokeWidth="2" strokeDasharray={j===1?'6 3':j===2?'2 3':undefined}/>)}</svg>{shown.length===0&&<p className="sana-radar-empty">{t('chooseCharacters')}</p>}{shown.map((f,j)=><details key={f.id??f.characterId} open><summary style={{color:colors[j]}}>{f.name}</summary><dl>{axes.map(k=><div key={k}><dt>{t(k)}</dt><dd>{f[k]??'—'}</dd></div>)}</dl>{axes.some(k=>f[k]==null)&&<p>{t('missingStats')}</p>}</details>)}</section>
+}

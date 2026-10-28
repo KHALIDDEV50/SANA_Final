@@ -1,0 +1,3084 @@
+{
+  "info": {
+    "_postman_id": "973b76a1-dea5-470e-99ec-9a84b4780c91",
+    "name": "SANA API",
+    "description": "SANA turns an idea into a structured, visual project for Technology, Business, Education and Creativity, with an AI assistant (n8n).\n\n**How to run:** import this file, then click **Run collection** (Collection Runner). Run the folders in order: each folder creates what it needs, saves IDs into collection variables, and deletes its project at the end.\n\n**Login:** HTTP Basic. A fresh test account is registered automatically on every run (`{{email}}` / `{{password}}`), plus a second account for the security checks.\n\n**Variables:** `baseUrl` is the live server. IDs (`projectId`, `outputId`, …) and `graphRevision` are filled in by the test scripts.\n\n**AI requests** need the n8n workflows to be active; the \"Wait for …\" requests poll every 3 seconds until n8n has answered.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{email}}",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "value": "{{password}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Every request: answers quickly and returns JSON",
+          "pm.test('Response time is under 15 s', () => pm.expect(pm.response.responseTime).to.be.below(15000));",
+          "if (pm.response.text().length) pm.test('Response is JSON', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.include('json'));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://13-63-96-176.sslip.io",
+      "type": "string"
+    },
+    {
+      "key": "name",
+      "value": "Postman Tester",
+      "type": "string"
+    },
+    {
+      "key": "email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "PostmanPass123",
+      "type": "string"
+    },
+    {
+      "key": "otherEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "outputId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "graphRevision",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "clientNodeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serviceNodeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "databaseNodeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "statusUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "proposalId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pollTries",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "businessProjectId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "swotOutputId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "storyProjectId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "storyOutputId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "characterNodeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "eventNodeId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Setup & authentication",
+      "description": "Creates two fresh test accounts (a new email on every run) and checks the login rules.\nAll other requests log in with HTTP Basic as `{{email}}` / `{{password}}`.",
+      "item": [
+        {
+          "name": "Register test user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "**Public.** Creates the account used by the rest of the collection. The password field is called `passwordHash`; the backend hashes it (BCrypt).\nA unique email is generated before each run.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"passwordHash\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const id = Date.now();",
+                  "pm.collectionVariables.set('email', `postman.${id}@example.com`);",
+                  "pm.collectionVariables.set('otherEmail', `postman.other.${id}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"User registered successfully\"', () => pm.expect(pm.response.json().message).to.include(\"User registered successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register the same email again (rejected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "**Public.** Negative test: an email can be registered only once.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"passwordHash\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "",
+                  "pm.test('Message: \"Email already exists\"', () => pm.expect(pm.response.json().message).to.include(\"Email already exists\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register second user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "**Public.** A second account, used later to prove users cannot reach each other's projects.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Other tester\",\n  \"email\": \"{{otherEmail}}\",\n  \"passwordHash\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wrong password (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Negative test: a wrong password is rejected with a JSON 401 (no browser login popup). Runs before the first login, because after a login the session cookie would authenticate the request.",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{email}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "wrong-password",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "",
+                  "pm.test('No WWW-Authenticate header (keeps the browser popup away)', () => pm.response.to.not.have.header('WWW-Authenticate'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No login (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/get/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get",
+                "my"
+              ]
+            },
+            "description": "Negative test: every endpoint except registration and the external callbacks needs a login.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get current user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "The logged-in user. The frontend calls this to check the email and password. Saves `userId`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const me = pm.response.json();",
+                  "pm.test('Returns the logged-in user with role USER', () => {",
+                  "    pm.expect(me.email).to.eql(pm.collectionVariables.get('email'));",
+                  "    pm.expect(me.role).to.eql('USER');",
+                  "});",
+                  "pm.test('Password is never returned', () => pm.expect(me).to.not.have.property('passwordHash'));",
+                  "pm.collectionVariables.set('userId', me.id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Projects",
+      "description": "Create, read and update a Technology project. It is used by the Diagrams and AI folders and deleted at the end of the AI folder.",
+      "item": [
+        {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/add/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "add",
+                "{{userId}}"
+              ]
+            },
+            "description": "Creates a project for the logged-in user. `domain` is TECH, BUSINESS, EDUCATION or CREATIVITY; `status` is DRAFT, ACTIVE or ARCHIVED. When billing is on, the plan's project limit is checked (409 when reached).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman – Food delivery app\",\n  \"description\": \"Customers order food from restaurants; drivers deliver it.\",\n  \"domain\": \"TECH\",\n  \"status\": \"DRAFT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"Project added successfully\"', () => pm.expect(pm.response.json().message).to.include(\"Project added successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get my projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/get/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get",
+                "my"
+              ]
+            },
+            "description": "The logged-in user's projects. Saves the new project's ID as `projectId`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const mine = pm.response.json().filter(p => p.name === \"Postman \\u2013 Food delivery app\");",
+                  "pm.test('The new project is listed', () => pm.expect(mine.length).to.be.above(0));",
+                  "const project = mine.sort((a, b) => b.id - a.id)[0];",
+                  "pm.collectionVariables.set('projectId', project.id);",
+                  "pm.test('Owner is the logged-in user, without password', () => {",
+                  "    pm.expect(project.owner.email).to.eql(pm.collectionVariables.get('email'));",
+                  "    pm.expect(project.owner).to.not.have.property('passwordHash');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get project by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/get/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get",
+                "{{projectId}}"
+              ]
+            },
+            "description": "One project (only the owner or an admin may read it)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Correct project', () => pm.expect(pm.response.json().name).to.eql(\"Postman \\u2013 Food delivery app\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/update/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "update",
+                "{{projectId}}"
+              ]
+            },
+            "description": "Updates the name, description and status.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman – Food delivery app\",\n  \"description\": \"Customers order food; restaurants prepare it; drivers deliver it.\",\n  \"domain\": \"TECH\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Another user cannot read this project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/get/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get",
+                "{{projectId}}"
+              ]
+            },
+            "description": "Security test: the second account tries to read the first account's project.",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{otherEmail}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "",
+                  "pm.test('Message: \"You do not have access\"', () => pm.expect(pm.response.json().message).to.include(\"You do not have access\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "All projects is admin-only (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/get",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get"
+              ]
+            },
+            "description": "Security test: lists of every user's data are for the ADMIN role only."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Diagrams (Technology – architecture)",
+      "description": "Builds a small system-architecture diagram: three components and two connections, then edits it.\nEvery change sends `expectedRevision`; the pre-request scripts read the current revision automatically.",
+      "item": [
+        {
+          "name": "List diagram types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "types"
+              ]
+            },
+            "description": "Every supported diagram type with its node types, edge types and rules."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const types = pm.response.json().map(t => t.diagramType);",
+                  "pm.test('Includes diagrams for all four domains', () => pm.expect(types).to.include.members(['ARCHITECTURE', 'ERD', 'SWOT', 'MIND_MAP', 'STORY_MAP']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create diagram",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/add/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "add",
+                "{{projectId}}"
+              ]
+            },
+            "description": "Creates an empty diagram of the given type in the project.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"System architecture\",\n  \"diagramType\": \"ARCHITECTURE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"Diagram added successfully\"', () => pm.expect(pm.response.json().message).to.include(\"Diagram added successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get project diagrams",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/get/project/{{projectId}}?diagramType=ARCHITECTURE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "get",
+                "project",
+                "{{projectId}}"
+              ],
+              "query": [
+                {
+                  "key": "diagramType",
+                  "value": "ARCHITECTURE"
+                }
+              ]
+            },
+            "description": "The project's diagrams, filtered by type. Saves `outputId`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const list = pm.response.json();",
+                  "pm.test('One architecture diagram', () => pm.expect(list.length).to.be.above(0));",
+                  "pm.collectionVariables.set('outputId', list.sort((a, b) => b.id - a.id)[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add node – Mobile app",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/node/add/{{outputId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "add",
+                "{{outputId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "Adds a CLIENT component. `label` is its name; `data` holds optional properties such as a description.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"CLIENT\",\n  \"label\": \"Mobile app\",\n  \"positionX\": 40,\n  \"positionY\": 120,\n  \"data\": {\n    \"description\": \"Customer app\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"Node added successfully\"', () => pm.expect(pm.response.json().message).to.include(\"Node added successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add node – Orders API",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/node/add/{{outputId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "add",
+                "{{outputId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "Adds a SERVICE component. `label` is its name; `data` holds optional properties such as a description.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"SERVICE\",\n  \"label\": \"Orders API\",\n  \"positionX\": 340,\n  \"positionY\": 120,\n  \"data\": {\n    \"description\": \"Handles orders\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"Node added successfully\"', () => pm.expect(pm.response.json().message).to.include(\"Node added successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add node – Orders DB",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/node/add/{{outputId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "add",
+                "{{outputId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "Adds a DATABASE component. `label` is its name; `data` holds optional properties such as a description.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"DATABASE\",\n  \"label\": \"Orders DB\",\n  \"positionX\": 640,\n  \"positionY\": 120,\n  \"data\": {\n    \"description\": \"Stores orders\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"Node added successfully\"', () => pm.expect(pm.response.json().message).to.include(\"Node added successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "graph",
+                "get",
+                "{{outputId}}"
+              ]
+            },
+            "description": "The full graph and its revision. Saves the three node IDs."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const g = pm.response.json();",
+                  "pm.collectionVariables.set('graphRevision', g.graphRevision);",
+                  "const byLabel = label => (g.graph.nodes.find(n => n.properties && n.properties.label === label) || {}).id;",
+                  "pm.collectionVariables.set('clientNodeId', byLabel('Mobile app'));",
+                  "pm.collectionVariables.set('serviceNodeId', byLabel('Orders API'));",
+                  "pm.collectionVariables.set('databaseNodeId', byLabel('Orders DB'));",
+                  "",
+                  "pm.test('Graph has the three components', () => pm.expect(g.graph.nodes.length).to.eql(3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add edge – app connects to API",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/edge/add/{{outputId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "edge",
+                "add",
+                "{{outputId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "Connects two components.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"CONNECTS_TO\",\n  \"label\": \"HTTPS\",\n  \"sourceNodeId\": \"{{clientNodeId}}\",\n  \"targetNodeId\": \"{{serviceNodeId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"Edge added successfully\"', () => pm.expect(pm.response.json().message).to.include(\"Edge added successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add edge – API data flow to DB",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/edge/add/{{outputId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "edge",
+                "add",
+                "{{outputId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "A DATA_FLOW edge; one end must be a DATABASE or QUEUE.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"DATA_FLOW\",\n  \"label\": \"reads/writes\",\n  \"sourceNodeId\": \"{{serviceNodeId}}\",\n  \"targetNodeId\": \"{{databaseNodeId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rule check – invalid data flow (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/edge/add/{{outputId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "edge",
+                "add",
+                "{{outputId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "Negative test: the diagram rules reject a DATA_FLOW between two components when neither is a database or queue.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"DATA_FLOW\",\n  \"label\": \"bad\",\n  \"sourceNodeId\": \"{{clientNodeId}}\",\n  \"targetNodeId\": \"{{serviceNodeId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "",
+                  "pm.test('Message: \"DATA_FLOW requires a DATABASE or QUEUE endpoint\"', () => pm.expect(pm.response.json().message).to.include(\"DATA_FLOW requires a DATABASE or QUEUE endpoint\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update node",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/node/update/{{outputId}}/{{serviceNodeId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "update",
+                "{{outputId}}",
+                "{{serviceNodeId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "Renames and moves a component.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"SERVICE\",\n  \"label\": \"Orders service\",\n  \"positionX\": 360,\n  \"positionY\": 140,\n  \"data\": {\n    \"description\": \"Handles orders and payments\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Message: \"Node updated successfully\"', () => pm.expect(pm.response.json().message).to.include(\"Node updated successfully\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stale revision is rejected (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/node/update/{{outputId}}/{{serviceNodeId}}?expectedRevision=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "update",
+                "{{outputId}}",
+                "{{serviceNodeId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Negative test: optimistic locking. A change based on an old revision (0) is refused, so two editors cannot overwrite each other.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"SERVICE\",\n  \"label\": \"Old edit\",\n  \"positionX\": 0,\n  \"positionY\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get graph after edits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "graph",
+                "get",
+                "{{outputId}}"
+              ]
+            },
+            "description": "Confirms the final diagram."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const g = pm.response.json();",
+                  "pm.collectionVariables.set('graphRevision', g.graphRevision);",
+                  "const byLabel = label => (g.graph.nodes.find(n => n.properties && n.properties.label === label) || {}).id;",
+                  "pm.collectionVariables.set('clientNodeId', byLabel('Mobile app'));",
+                  "pm.collectionVariables.set('serviceNodeId', byLabel('Orders service'));",
+                  "pm.collectionVariables.set('databaseNodeId', byLabel('Orders DB'));",
+                  "",
+                  "pm.test('Three components and two connections', () => {",
+                  "    pm.expect(g.graph.nodes.length).to.eql(3);",
+                  "    pm.expect(g.graph.edges.length).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rename diagram",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/update/{{outputId}}?expectedRevision={{graphRevision}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "update",
+                "{{outputId}}"
+              ],
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "{{graphRevision}}"
+                }
+              ]
+            },
+            "description": "Renames the diagram.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Food delivery – architecture\",\n  \"diagramType\": \"ARCHITECTURE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Diagram changes must send the current graph revision; read it first",
+                  "const auth = 'Basic ' + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(pm.variables.replaceIn('{{email}}:{{password}}')));",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.replaceIn('{{baseUrl}}/api/v1/diagram/graph/get/{{outputId}}'),",
+                  "    method: 'GET',",
+                  "    header: { Authorization: auth }",
+                  "}, (err, res) => {",
+                  "    if (!err && res.code === 200) pm.collectionVariables.set('graphRevision', res.json().graphRevision);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. AI assistant",
+      "description": "AI requests are asynchronous: the backend stores the request, sends it to n8n and answers **202**; n8n calls back later.\nThe \"Wait for …\" requests repeat themselves every 3 seconds until the request has finished (requires the Collection Runner).\nNeeds the n8n workflows to be active.",
+      "item": [
+        {
+          "name": "Quick start – classify an idea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ai/quick-start/classify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "ai",
+                "quick-start",
+                "classify"
+              ]
+            },
+            "description": "\"Start with SANA AI\": the AI suggests the domain, diagram type and a project name for an idea. Nothing is created.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idea\": \"A mobile app where customers order food from nearby restaurants and drivers deliver it.\",\n  \"language\": \"en\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const s = pm.response.json();",
+                  "pm.test('Suggests a category, domain, diagram and name', () => {",
+                  "    pm.expect(s.category).to.be.oneOf(['TECHNOLOGY', 'BUSINESS', 'EDUCATION', 'WRITING', 'GAMES']);",
+                  "    pm.expect(s.domain).to.be.oneOf(['TECH', 'BUSINESS', 'EDUCATION', 'CREATIVITY']);",
+                  "    pm.expect(s.diagramType).to.be.a('string');",
+                  "    pm.expect(s.projectName).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ask for advice (ADVISE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/ai/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "ai",
+                "requests"
+              ]
+            },
+            "description": "Asks the AI to review the open diagram. The answer is advice; nothing changes.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": \"ADVISE\",\n  \"prompt\": \"Review this architecture and suggest the most important improvement.\",\n  \"outputId\": \"{{outputId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 202 (accepted, answered later by n8n)', () => pm.response.to.have.status(202));",
+                  "const run = pm.response.json();",
+                  "pm.test('Has a request ID and a status URL', () => { pm.expect(run.requestId).to.be.a('string'); pm.expect(run.statusUrl).to.include(run.requestId); });",
+                  "pm.collectionVariables.set('statusUrl', run.statusUrl);",
+                  "pm.collectionVariables.set('pollTries', 0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wait for the advice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{statusUrl}}",
+              "host": [
+                "{{baseUrl}}{{statusUrl}}"
+              ]
+            },
+            "description": "Polls the request until n8n has answered."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const run = pm.response.json();",
+                  "const tries = Number(pm.collectionVariables.get('pollTries') || 0);",
+                  "if (['PENDING', 'RUNNING'].includes(run.status) && tries < 40) {",
+                  "    pm.collectionVariables.set('pollTries', tries + 1);",
+                  "    setTimeout(() => {}, 3000);",
+                  "    if (pm.execution && pm.execution.setNextRequest) pm.execution.setNextRequest(pm.info.requestName);",
+                  "    else postman.setNextRequest(pm.info.requestName);",
+                  "} else {",
+                  "    pm.collectionVariables.set('pollTries', 0);",
+                  "    pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "    pm.test('AI request finished (COMPLETED)', () => pm.expect(run.status).to.eql('COMPLETED'));",
+                  "    pm.test('Result has a type and a message', () => {",
+                  "        pm.expect(run.result).to.be.an('object');",
+                  "        pm.expect(run.result.type).to.be.oneOf(['ADVICE', 'CLARIFICATION', 'PROPOSAL']);",
+                  "        pm.expect(run.result.message).to.be.a('string');",
+                  "    });",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ask to draw a diagram (CREATE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/ai/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "ai",
+                "requests"
+              ]
+            },
+            "description": "Asks the AI to draw a new diagram. The result is a proposal to review.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": \"CREATE\",\n  \"prompt\": \"Draw the architecture of a food delivery app with a customer app, a restaurant dashboard, an orders service and a database.\",\n  \"diagramType\": \"ARCHITECTURE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('proposalId', '');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 202 (accepted, answered later by n8n)', () => pm.response.to.have.status(202));",
+                  "const run = pm.response.json();",
+                  "pm.test('Has a request ID and a status URL', () => { pm.expect(run.requestId).to.be.a('string'); pm.expect(run.statusUrl).to.include(run.requestId); });",
+                  "pm.collectionVariables.set('statusUrl', run.statusUrl);",
+                  "pm.collectionVariables.set('pollTries', 0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wait for the proposal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{statusUrl}}",
+              "host": [
+                "{{baseUrl}}{{statusUrl}}"
+              ]
+            },
+            "description": "Polls until the AI has answered. Saves `proposalId` when the answer is a proposal."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const run = pm.response.json();",
+                  "const tries = Number(pm.collectionVariables.get('pollTries') || 0);",
+                  "if (['PENDING', 'RUNNING'].includes(run.status) && tries < 40) {",
+                  "    pm.collectionVariables.set('pollTries', tries + 1);",
+                  "    setTimeout(() => {}, 3000);",
+                  "    if (pm.execution && pm.execution.setNextRequest) pm.execution.setNextRequest(pm.info.requestName);",
+                  "    else postman.setNextRequest(pm.info.requestName);",
+                  "} else {",
+                  "    pm.collectionVariables.set('pollTries', 0);",
+                  "    pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "    pm.test('AI request finished (COMPLETED)', () => pm.expect(run.status).to.eql('COMPLETED'));",
+                  "    pm.test('Result has a type and a message', () => {",
+                  "        pm.expect(run.result).to.be.an('object');",
+                  "        pm.expect(run.result.type).to.be.oneOf(['ADVICE', 'CLARIFICATION', 'PROPOSAL']);",
+                  "        pm.expect(run.result.message).to.be.a('string');",
+                  "    });",
+                  "    if (run.proposalId) pm.collectionVariables.set('proposalId', run.proposalId);",
+                  "    pm.test('Answer is a proposal or a clarification question', () => pm.expect((run.result || {}).type).to.be.oneOf(['PROPOSAL', 'CLARIFICATION']));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preview the proposal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/ai/proposals/{{proposalId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "ai",
+                "proposals",
+                "{{proposalId}}"
+              ]
+            },
+            "description": "The proposed diagram and the computed changes (create / update / delete)."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Skipped when the AI asked a clarification question instead",
+                  "if (!pm.collectionVariables.get('proposalId')) {",
+                  "    if (pm.execution && pm.execution.skipRequest) pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const p = pm.response.json();",
+                  "pm.test('Proposal is pending and lists its changes', () => { pm.expect(p.reviewStatus || p.status).to.match(/PENDING/); pm.expect(p.changes).to.be.an('array').that.is.not.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Accept the proposal",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/ai/proposals/{{proposalId}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "ai",
+                "proposals",
+                "{{proposalId}}",
+                "accept"
+              ]
+            },
+            "description": "Applies the proposal: the AI's diagram is saved."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Skipped when there is no proposal",
+                  "if (!pm.collectionVariables.get('proposalId')) {",
+                  "    if (pm.execution && pm.execution.skipRequest) pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Returns the diagram that was created', () => pm.expect(pm.response.json().outputId).to.be.a('number'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chat history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}/ai/requests?messages=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectId}}",
+                "ai",
+                "requests"
+              ],
+              "query": [
+                {
+                  "key": "messages",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "The project's latest 50 AI requests with prompts and answers (used to restore the chat after a reload)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const runs = pm.response.json();",
+                  "pm.test('Contains both requests with their prompts', () => {",
+                  "    pm.expect(runs.length).to.be.at.least(2);",
+                  "    pm.expect(runs.map(r => r.prompt).join(' ')).to.include('Review this architecture');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete the Technology project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/delete/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "delete",
+                "{{projectId}}"
+              ]
+            },
+            "description": "Clean-up: deletes the project and its diagrams."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Business",
+      "description": "Runs the SWOT Business tool on a Business project. The project is deleted at the end.",
+      "item": [
+        {
+          "name": "Create Business project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/add/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "add",
+                "{{userId}}"
+              ]
+            },
+            "description": "A project in the BUSINESS domain.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman – Coffee subscription\",\n  \"description\": \"A monthly subscription for specialty coffee beans in Riyadh.\",\n  \"domain\": \"BUSINESS\",\n  \"status\": \"DRAFT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get my projects (Business)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/get/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get",
+                "my"
+              ]
+            },
+            "description": "Saves `businessProjectId`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const mine = pm.response.json().filter(p => p.name === \"Postman \\u2013 Coffee subscription\");",
+                  "pm.test('The new project is listed', () => pm.expect(mine.length).to.be.above(0));",
+                  "const project = mine.sort((a, b) => b.id - a.id)[0];",
+                  "pm.collectionVariables.set('businessProjectId', project.id);",
+                  "pm.test('Owner is the logged-in user, without password', () => {",
+                  "    pm.expect(project.owner.email).to.eql(pm.collectionVariables.get('email'));",
+                  "    pm.expect(project.owner).to.not.have.property('passwordHash');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create SWOT diagram",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/add/{{businessProjectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "add",
+                "{{businessProjectId}}"
+              ]
+            },
+            "description": "Business diagrams use the shared diagram endpoints.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"SWOT analysis\",\n  \"diagramType\": \"SWOT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get SWOT diagram",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/get/project/{{businessProjectId}}?diagramType=SWOT",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "get",
+                "project",
+                "{{businessProjectId}}"
+              ],
+              "query": [
+                {
+                  "key": "diagramType",
+                  "value": "SWOT"
+                }
+              ]
+            },
+            "description": "Saves `swotOutputId`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const list = pm.response.json();",
+                  "pm.collectionVariables.set('swotOutputId', list.sort((a, b) => b.id - a.id)[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get SWOT graph revision",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/graph/get/{{swotOutputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "graph",
+                "get",
+                "{{swotOutputId}}"
+              ]
+            },
+            "description": "Saves the current revision, which the Business tool needs."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('graphRevision', pm.response.json().graphRevision);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Run the SWOT tool",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/business/tools",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "business",
+                "tools"
+              ]
+            },
+            "description": "Runs one of the five Business tools (`toolType`: BUSINESS_MODEL_BUILDER, TARGET_AUDIENCE_BUILDER, SWOT_ANALYZER, COMPETITOR_ANALYSIS, RISK_ANALYZER). `inputJson` is a JSON object as a string. The structured report arrives later through n8n.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{businessProjectId}}\",\n  \"toolType\": \"SWOT_ANALYZER\",\n  \"outputId\": \"{{swotOutputId}}\",\n  \"baseRevision\": \"{{graphRevision}}\",\n  \"inputJson\": \"{\\\"projectName\\\": \\\"Postman – Coffee subscription\\\", \\\"description\\\": \\\"A monthly subscription for specialty coffee beans in Riyadh.\\\", \\\"facts\\\": [\\\"Delivery inside Riyadh only\\\"], \\\"assumptions\\\": [\\\"Customers prefer local roasters\\\"], \\\"unknowns\\\": [\\\"Price sensitivity\\\"]}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 or 202 (answered later by n8n)', () => pm.expect(pm.response.code).to.be.oneOf([200, 202]));",
+                  "const run = pm.response.json();",
+                  "pm.test('Has a request ID and a status URL', () => { pm.expect(run.requestId).to.be.a('string'); pm.expect(run.statusUrl).to.include(run.requestId); });",
+                  "pm.collectionVariables.set('statusUrl', run.statusUrl);",
+                  "pm.collectionVariables.set('pollTries', 0);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wait for the SWOT report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{statusUrl}}",
+              "host": [
+                "{{baseUrl}}{{statusUrl}}"
+              ]
+            },
+            "description": "Polls until the report is ready. The report is a JSON document inside `result.message`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const run = pm.response.json();",
+                  "const tries = Number(pm.collectionVariables.get('pollTries') || 0);",
+                  "if (['PENDING', 'RUNNING'].includes(run.status) && tries < 40) {",
+                  "    pm.collectionVariables.set('pollTries', tries + 1);",
+                  "    setTimeout(() => {}, 3000);",
+                  "    if (pm.execution && pm.execution.setNextRequest) pm.execution.setNextRequest(pm.info.requestName);",
+                  "    else postman.setNextRequest(pm.info.requestName);",
+                  "} else {",
+                  "    pm.collectionVariables.set('pollTries', 0);",
+                  "    pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "    pm.test('AI request finished (COMPLETED)', () => pm.expect(run.status).to.eql('COMPLETED'));",
+                  "    pm.test('Result has a type and a message', () => {",
+                  "        pm.expect(run.result).to.be.an('object');",
+                  "        pm.expect(run.result.type).to.be.oneOf(['ADVICE', 'CLARIFICATION', 'PROPOSAL']);",
+                  "        pm.expect(run.result.message).to.be.a('string');",
+                  "    });",
+                  "    pm.test('Answer is a structured report (ADVICE)', () => pm.expect((run.result || {}).type).to.eql('ADVICE'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Saudi economic indicators (World Bank)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/external/world-bank/saudi-indicators",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "external",
+                "world-bank",
+                "saudi-indicators"
+              ]
+            },
+            "description": "Indicators fetched live from the World Bank API."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete the Business project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/delete/{{businessProjectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "delete",
+                "{{businessProjectId}}"
+              ]
+            },
+            "description": "Clean-up."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Creativity (story map)",
+      "description": "Builds a small story map (world, character, event, relationship), then uses the timeline, search and inspiration tools. The project is deleted at the end.",
+      "item": [
+        {
+          "name": "Create Creativity project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/add/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "add",
+                "{{userId}}"
+              ]
+            },
+            "description": "A project in the CREATIVITY domain (writing and games).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman – The light flower\",\n  \"description\": \"A children's story about sharing.\",\n  \"domain\": \"CREATIVITY\",\n  \"status\": \"DRAFT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get my projects (Creativity)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/get/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get",
+                "my"
+              ]
+            },
+            "description": "Saves `storyProjectId`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const mine = pm.response.json().filter(p => p.name === \"Postman \\u2013 The light flower\");",
+                  "pm.test('The new project is listed', () => pm.expect(mine.length).to.be.above(0));",
+                  "const project = mine.sort((a, b) => b.id - a.id)[0];",
+                  "pm.collectionVariables.set('storyProjectId', project.id);",
+                  "pm.test('Owner is the logged-in user, without password', () => {",
+                  "    pm.expect(project.owner.email).to.eql(pm.collectionVariables.get('email'));",
+                  "    pm.expect(project.owner).to.not.have.property('passwordHash');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create story map",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/add/{{storyProjectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "add",
+                "{{storyProjectId}}"
+              ]
+            },
+            "description": "Creates the story map that holds the story elements.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Story map\",\n  \"diagramType\": \"STORY_MAP\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get story map",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/get/project/{{storyProjectId}}?diagramType=STORY_MAP",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "get",
+                "project",
+                "{{storyProjectId}}"
+              ],
+              "query": [
+                {
+                  "key": "diagramType",
+                  "value": "STORY_MAP"
+                }
+              ]
+            },
+            "description": "Saves `storyOutputId`."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const list = pm.response.json();",
+                  "pm.collectionVariables.set('storyOutputId', list.sort((a, b) => b.id - a.id)[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add world",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/world/add/{{storyOutputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "world",
+                "add",
+                "{{storyOutputId}}"
+              ]
+            },
+            "description": "Adds a world to the story map.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"positionX\": 400,\n  \"positionY\": 80,\n  \"name\": \"Colour Forest\",\n  \"description\": \"A forest whose flowers change colour with feelings.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add character",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/character-profile/add/{{storyOutputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "character-profile",
+                "add",
+                "{{storyOutputId}}"
+              ]
+            },
+            "description": "Adds a character. `name`, `shortDescription`, `role` and `age` are required.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"positionX\": 120,\n  \"positionY\": 300,\n  \"name\": \"Lina\",\n  \"shortDescription\": \"A curious girl who loves plants.\",\n  \"role\": \"Protagonist\",\n  \"age\": 8\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add story event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/story-event/add/{{storyOutputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "story-event",
+                "add",
+                "{{storyOutputId}}"
+              ]
+            },
+            "description": "Adds an event. `presentationOrder` sets its place in the narrative.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"positionX\": 400,\n  \"positionY\": 300,\n  \"title\": \"The flower loses its light\",\n  \"description\": \"Lina notices the magic flower has gone dark.\",\n  \"eventType\": \"Beginning\",\n  \"presentationOrder\": 1,\n  \"chronologicalOrder\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get story map graph",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagram/graph/get/{{storyOutputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "graph",
+                "get",
+                "{{storyOutputId}}"
+              ]
+            },
+            "description": "Saves the character and event node IDs."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "const nodes = pm.response.json().graph.nodes;",
+                  "pm.test('World, character and event are on the map', () => pm.expect(nodes.map(n => n.type)).to.include.members(['WORLD', 'CHARACTER', 'STORY_EVENT']));",
+                  "pm.collectionVariables.set('characterNodeId', nodes.find(n => n.type === 'CHARACTER').id);",
+                  "pm.collectionVariables.set('eventNodeId', nodes.find(n => n.type === 'STORY_EVENT').id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Allowed relationship types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/creativity/relations/get/types/{{storyOutputId}}/{{characterNodeId}}/{{eventNodeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "creativity",
+                "relations",
+                "get",
+                "types",
+                "{{storyOutputId}}",
+                "{{characterNodeId}}",
+                "{{eventNodeId}}"
+              ]
+            },
+            "description": "The relationship types allowed between the two selected elements."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('A character may take part in an event', () => pm.expect(JSON.stringify(pm.response.json())).to.include('PARTICIPATES_IN'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create relationship",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/creativity/relations/add/{{storyOutputId}}/{{characterNodeId}}/{{eventNodeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "creativity",
+                "relations",
+                "add",
+                "{{storyOutputId}}",
+                "{{characterNodeId}}",
+                "{{eventNodeId}}"
+              ]
+            },
+            "description": "Connects the character to the event.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PARTICIPATES_IN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is one of [200, 201]', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get relationships",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/creativity/relations/get/{{storyOutputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "creativity",
+                "relations",
+                "get",
+                "{{storyOutputId}}"
+              ]
+            },
+            "description": "All relationships in the story map."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('One relationship', () => pm.expect(pm.response.json().length).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Story timeline",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/story-event/timeline/presentation/{{storyOutputId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "story-event",
+                "timeline",
+                "presentation",
+                "{{storyOutputId}}"
+              ]
+            },
+            "description": "Events in narrative order."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search the story map",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/creativity/search/{{storyOutputId}}?keyword=Lina",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "creativity",
+                "search",
+                "{{storyOutputId}}"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "Lina"
+                }
+              ]
+            },
+            "description": "Finds elements by keyword."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Finds the character', () => pm.expect(JSON.stringify(pm.response.json())).to.include('Lina'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Book inspiration (Open Library)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/creativity/books/search?keyword=forest fairy tale",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "creativity",
+                "books",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "forest fairy tale"
+                }
+              ]
+            },
+            "description": "Searches Open Library for books."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Moodboard image search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/creativity/moodboard/images/search?keyword=forest&pageSize=8",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "creativity",
+                "moodboard",
+                "images",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "forest"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "8"
+                }
+              ]
+            },
+            "description": "Searches museum and free image libraries (Pixabay only when its key is set)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete the Creativity project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/project/delete/{{storyProjectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "delete",
+                "{{storyProjectId}}"
+              ]
+            },
+            "description": "Clean-up."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Billing",
+      "description": "Plans and the user's membership. Payments use Moyasar in test mode and are only active when billing is turned on.",
+      "item": [
+        {
+          "name": "Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/billing/plans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "billing",
+                "plans"
+              ]
+            },
+            "description": "Plans, prices (in halalas) and project limits."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Spark, Glow and Horizon plans', () => pm.expect(pm.response.json().plans.map(p => p.code)).to.include.members(['SPARK', 'GLOW', 'HORIZON']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My membership",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/billing/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "billing",
+                "me"
+              ]
+            },
+            "description": "The current plan, projects used and limit."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('A new account is on the free plan', () => pm.expect(pm.response.json().planCode).to.eql('SPARK'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My payment orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/billing/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "billing",
+                "orders"
+              ]
+            },
+            "description": "The user's last 10 payment orders (empty for a new account)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

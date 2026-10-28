@@ -1,0 +1,18 @@
+.creativity-mood-preview { overflow-wrap: anywhere; }
+.creativity-mood-preview h3, .creativity-mood-preview h4 { margin: 12px 0 8px; color: inherit; }
+.creativity-mood-preview p, .creativity-mood-preview li { font-size: 13px; line-height: 1.7; }
+.creativity-mood-preview ul { padding-inline-start: 20px; }
+.creativity-mood-preview__images { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.creativity-mood-preview__images figure { margin: 0; min-width: 0; }
+.creativity-mood-preview__images img { width: 100%; height: 125px; object-fit: cover; border-radius: 9px; }
+.creativity-mood-preview__images figcaption { font-size: 11px; line-height: 1.6; }
+.creativity-mood-preview a, .creativity-mood-attribution a { color: inherit; text-decoration: underline; }
+.creativity-mood-preview small, .creativity-mood-attribution small { display: block; font-size: 10px; }
+.creativity-mood-preview__palette { display: flex; flex-wrap: wrap; gap: 12px; }
+.creativity-mood-preview__palette > div { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.creativity-mood-preview__palette span { height: 26px; min-width: 65px; border-radius: 5px; }
+.creativity-mood-preview .modal-actions { flex-wrap: wrap; }
+.creativity-mood-chat-notice { font-size: 12px; line-height: 1.7; }
+.creativity-mood-attribution { display: block; color: var(--muted, #627379); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+
+.creativity-mood-preview{background:linear-gradient(145deg,#fffdf8,#f3f5e9);border:1px solid #d6dccb;padding:18px}.creativity-mood-preview__status{color:#8d6d31;font-size:12px}.creativity-mood-preview__images figure{background:#fffefa;border:1px solid #deded0;border-radius:12px;padding:6px;box-shadow:0 4px 10px #18353b08}.creativity-mood-preview__images figcaption{padding:6px}.creativity-mood-preview__palette>div{border:1px solid #e3dfcf;padding:7px;border-radius:10px;background:#fffdf8}.creativity-mood-preview details{margin-block:12px}.creativity-mood-preview summary{cursor:pointer;color:#6c7b69}

@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sana:tech:architecture-graph:v1",
+  "title": "Sana Architecture Graph v1",
+  "$comment": "Graph format only; schemaVersion belongs to the integration envelope. Existing keys must match IDs (node:<id>, edge:<id>); new elements have null IDs and unique new:<key> keys. Backend validation must enforce unique IDs/keys, endpoint membership, authorization, type/domain rules and revisions. properties.title maps to ProjectOutput.title. Edge label is separate from arbitrary properties to avoid collisions. Null stored dataJson maps to an empty object. This schema is documentation, not an installed runtime validator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "nodes",
+    "edges",
+    "properties"
+  ],
+  "properties": {
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "properties": {
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "id",
+        "type",
+        "properties",
+        "positionX",
+        "positionY"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "id": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "positionX": {
+          "type": "number"
+        },
+        "positionY": {
+          "type": "number"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "id": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "key": {
+                "pattern": "^new:[A-Za-z0-9_-]+$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "key": {
+                "pattern": "^node:[1-9][0-9]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "id",
+        "type",
+        "properties",
+        "label",
+        "sourceKey",
+        "targetKey"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "id": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "sourceKey": {
+          "type": "string",
+          "pattern": "^(node:[1-9][0-9]*|new:[A-Za-z0-9_-]+)$"
+        },
+        "targetKey": {
+          "type": "string",
+          "pattern": "^(node:[1-9][0-9]*|new:[A-Za-z0-9_-]+)$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "id": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "key": {
+                "pattern": "^new:[A-Za-z0-9_-]+$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "key": {
+                "pattern": "^edge:[1-9][0-9]*$"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

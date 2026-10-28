@@ -1,0 +1,51 @@
+HELP.md
+.DS_Store
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Local only ###
+# Older local test suites stay out of git; the JUnit tests directly in src/test/java/com/example/sana/ are submitted
+src/test/java/com/example/sana/Controller/
+src/test/java/com/example/sana/Integration/
+src/test/java/com/example/sana/Model/
+src/test/java/com/example/sana/Service/
+docs/
+.mcp.json
+.codex/
+.claude/
+
+### Server secrets (deployment) ###
+/.env
+
+### Downloaded moodboard images (local runs) ###
+sana-moodboard-images/

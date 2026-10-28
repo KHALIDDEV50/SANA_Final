@@ -1,0 +1,39 @@
+/* Business-only styles keep the other domain workspaces unchanged. */
+.ai-sidebar.business-panel{width:min(680px,96vw);max-width:96vw}
+.business-panel button,.business-panel select,.business-panel textarea{font:inherit}
+.business-panel button{cursor:pointer;border:1px solid #c4ad80;border-radius:8px;padding:8px 12px;background:var(--surface,#fbf7ef);color:inherit}
+.business-panel button:disabled{cursor:wait;opacity:.55}
+.business-body{display:flex;flex-direction:column;gap:14px;min-height:0;overflow:auto;padding:16px}
+.business-body p,.business-message,.business-fields dd{white-space:pre-wrap;overflow-wrap:anywhere}
+.business-panel label{display:flex;flex-direction:column;gap:5px}
+.business-panel select,.business-panel textarea{max-width:100%;width:100%;box-sizing:border-box;color:inherit;background:var(--surface,#fbf7ef);border:1px solid #c4ad80;border-radius:8px;padding:8px}
+.business-panel select{font-size:13px}
+.business-form{display:flex;flex-direction:column;gap:10px;max-height:48vh;overflow:auto;flex-shrink:0}
+.business-run{border-inline-start:3px solid #a0814b;padding-inline-start:10px;display:flex;flex-direction:column;gap:5px}
+.business-run small{overflow-wrap:anywhere}
+.business-error{color:#b42318;background:#fff1ee;padding:10px;border-radius:8px}
+.business-report details,.business-preview details{border:1px solid #d6c8ab;border-radius:8px;margin-block:8px;padding:10px}
+.business-panel summary{cursor:pointer;font-weight:600;padding-block:4px}
+.business-fields{margin:8px 0}
+.business-fields>div{margin-block:8px;border-bottom:1px solid #d6c8ab66;padding-bottom:6px}
+.business-fields dt{font-weight:600;font-size:.9em;opacity:.85}
+.business-fields dd{margin:4px 0}
+.business-values{padding-inline-start:20px}
+.business-values>li{padding-block:5px}
+.business-priority{border-radius:6px;padding:2px 7px;background:#eee}
+.business-priority.high{color:#912018;background:#fde8e5}
+.business-priority.medium{color:#77520c;background:#fff1c8}
+.business-priority.low{color:#176342;background:#e2f3e9}
+.business-preview svg{width:100%;min-height:180px;max-height:400px;background:#fffdf8;border-radius:8px;color:#352f23}
+.business-preview-item{border-bottom:1px solid #d6c8ab;padding-block:10px}
+.business-preview-item small{display:block}
+.business-preview pre{white-space:pre-wrap;overflow-wrap:anywhere;direction:ltr;text-align:left;font-size:12px}
+.business-question,.business-proposal{padding:12px;border:1px solid #d6c8ab;border-radius:10px}
+.business-question button{margin:4px}
+.business-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:600px){.ai-sidebar.business-panel{width:96vw}.business-form{max-height:45vh}}
+/* Preserve contrast against the application's dark AI sidebar. */
+.ai-sidebar.business-panel .ai-side-head strong{color:#f6eedf}
+.ai-sidebar.business-panel button,.ai-sidebar.business-panel select,.ai-sidebar.business-panel textarea{color:#20383a;background:#fbf7ef}
+.ai-sidebar.business-panel .business-preview{color:#20383a;background:#fbf7ef;padding:10px;border-radius:8px}
+.ai-sidebar.business-panel .business-error{color:#912018}
