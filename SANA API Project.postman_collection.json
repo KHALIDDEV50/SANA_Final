@@ -1,0 +1,1127 @@
+{
+  "info": {
+    "_collection_link": "https://go.postman.co/collection/9896429-5c193f0f-8332-42a1-8598-7b5651d7771b?source=collection_link",
+    "_exporter_id": "9896429",
+    "_postman_id": "5c193f0f-8332-42a1-8598-7b5651d7771b",
+    "name": "SANA API Project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "item": [
+        {
+          "name": "Add user",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"name\": \"SANA Test User\",\n  \"email\": \"sana.test@example.com\",\n  \"passwordHash\": \"12345678\"\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "user",
+                "add"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/user/add"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create an account",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"name\": \"Khalid Business\",\n  \"email\": \"khalid.business@example.com\",\n  \"passwordHash\": \"SanaTest@2026\"\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/auth/register"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logged-in",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get my project",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ],
+      "name": "Users"
+    },
+    {
+      "item": [
+        {
+          "name": "Add project",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "\n{\n  \"name\": \"منصة إدارة الأملاك\",\n  \"description\": \"منصة رقمية مقترحة لإدارة العقارات في المملكة العربية السعودية، تستهدف ملاك العقارات ومديري الأملاك. تشمل إدارة العقارات والوحدات والعقود والإيجارات والتحصيل والصيانة والتقارير التشغيلية. المشروع في مرحلة دراسة الفكرة، ولا تتوفر حاليًا بيانات موثقة عن حجم السوق أو المنافسين أو استعداد العملاء للدفع.\",\n  \"domain\": \"BUSINESS\",\n  \"status\": \"DRAFT\"\n}\n"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "add",
+                "1"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/project/add/1"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project",
+                "get"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/project/get"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get project out put",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project-output",
+                "get",
+                "project",
+                "2"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/project-output/get/project/2"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add project out put",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"title\": \"اختبار نموذج العمل لمنصة إدارة الأملاك\",\n  \"outputType\": \"BUSINESS_MODEL_BUILDER\",\n  \"representationType\": \"GRAPH\"\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "project-output",
+                "add",
+                "2"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/project-output/add/2"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get project user",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ],
+      "name": "Project"
+    },
+    {
+      "item": [
+        {
+          "name": "BUSINESS_MODEL_BUILDER",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"projectId\": 2,\n  \"toolType\": \"BUSINESS_MODEL_BUILDER\",\n  \"outputId\": 1,\n  \"inputJson\": \"{\\\"projectName\\\":\\\"منصة إدارة الأملاك\\\",\\\"market\\\":\\\"المملكة العربية السعودية\\\",\\\"targetCustomers\\\":[\\\"ملاك العقارات\\\",\\\"مديرو الأملاك\\\"],\\\"stage\\\":\\\"فكرة قيد الدراسة\\\",\\\"plannedFeatures\\\":[\\\"إدارة العقود\\\",\\\"الإيجارات والتحصيل\\\",\\\"الصيانة\\\",\\\"التقارير\\\"],\\\"unknowns\\\":[\\\"التسعير\\\",\\\"الميزانية\\\",\\\"استعداد العملاء للدفع\\\"]}\"\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "business",
+                "tools"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/business/tools"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TARGET_AUDIENCE_BUILDER",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"projectId\": 1,\n  \"inputJson\": \"{}\"\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "business",
+                "tools"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/business/tools"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SWOT_ANALYZER",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "\n\n{\n  \"projectId\": 2,\n  \"toolType\": \"SWOT_ANALYZER\",\n  \"inputJson\": \"{\\\"projectName\\\":\\\"منصة إدارة الأملاك\\\",\\\"description\\\":\\\"منصة لإدارة العقارات والوحدات والعقود والإيجارات والتحصيل والصيانة والتقارير.\\\",\\\"market\\\":\\\"المملكة العربية السعودية\\\",\\\"targetCustomers\\\":[\\\"ملاك العقارات\\\",\\\"مديرو الأملاك\\\"],\\\"stage\\\":\\\"فكرة قيد الدراسة\\\",\\\"facts\\\":[\\\"السوق المستهدف هو المملكة العربية السعودية\\\",\\\"العملاء المستهدفون ملاك العقارات ومديرو الأملاك\\\",\\\"النطاق يشمل العقود والإيجارات والتحصيل والصيانة والتقارير\\\"],\\\"assumptions\\\":[\\\"قد يناسب العملاء نموذج اشتراك دوري، ويحتاج ذلك إلى التحقق\\\"],\\\"unknowns\\\":[\\\"التسعير\\\",\\\"الميزانية\\\",\\\"عدد العملاء المتوقع\\\",\\\"المنافسون المحددون\\\",\\\"استعداد العملاء للدفع\\\"]}\"\n}\n\n"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "business",
+                "tools"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/business/tools"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "COMPETITOR_ANALYSIS",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"projectId\": 2,\n  \"toolType\": \"COMPETITOR_ANALYSIS\",\n  \"inputJson\": \"{\\\"projectName\\\":\\\"منصة إدارة الأملاك\\\",\\\"market\\\":\\\"المملكة العربية السعودية\\\",\\\"stage\\\":\\\"فكرة قيد الدراسة\\\",\\\"plannedFeatures\\\":[\\\"إدارة العقود\\\",\\\"التحصيل\\\",\\\"الصيانة\\\",\\\"التقارير\\\"],\\\"testContext\\\":\\\"المنافسون والميزات التالية بيانات افتراضية لاختبار المقارنة فقط، وليست معلومات عن شركات حقيقية. المطلوب مقارنتهم ضمن هذا السيناريو.\\\",\\\"competitors\\\":[{\\\"name\\\":\\\"منافس تجريبي أ\\\",\\\"competitorType\\\":\\\"DIRECT\\\",\\\"providedFeatures\\\":[\\\"إدارة العقود\\\",\\\"متابعة التحصيل\\\"],\\\"pricing\\\":\\\"غير معلوم\\\",\\\"maintenanceSupport\\\":\\\"غير معلوم\\\"},{\\\"name\\\":\\\"منافس تجريبي ب\\\",\\\"competitorType\\\":\\\"DIRECT\\\",\\\"providedFeatures\\\":[\\\"إدارة طلبات الصيانة\\\",\\\"التقارير\\\"],\\\"pricing\\\":\\\"غير معلوم\\\",\\\"contractManagementSupport\\\":\\\"غير معلوم\\\"}],\\\"constraints\\\":[\\\"قارن المنافسين الافتراضيين باستخدام البيانات المقدمة فقط\\\",\\\"عدم ذكر ميزة لا يعني عدم توفرها\\\",\\\"لا تخترع أسعارا أو حصصا سوقية\\\",\\\"لا تعتبر الميزات المخططة للمنصة تفوقا مثبتا\\\"]}\"\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "business",
+                "tools"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/business/tools"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RISK_ANALYZER",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "\n{\n  \"projectId\": 2,\n  \"toolType\": \"RISK_ANALYZER\",\n  \"inputJson\": \"{\\\"projectName\\\":\\\"منصة إدارة الأملاك\\\",\\\"description\\\":\\\"منصة لإدارة العقارات والوحدات والعقود والإيجارات والتحصيل والصيانة والتقارير.\\\",\\\"market\\\":\\\"المملكة العربية السعودية\\\",\\\"targetCustomers\\\":[\\\"ملاك العقارات\\\",\\\"مديرو الأملاك\\\"],\\\"stage\\\":\\\"فكرة قيد الدراسة\\\",\\\"facts\\\":[\\\"السوق المستهدف هو المملكة العربية السعودية\\\",\\\"العملاء المستهدفون ملاك العقارات ومديرو الأملاك\\\",\\\"النطاق يشمل العقود والإيجارات والتحصيل والصيانة والتقارير\\\"],\\\"assumptions\\\":[\\\"قد يناسب العملاء نموذج اشتراك دوري، ويحتاج ذلك إلى التحقق\\\"],\\\"unknowns\\\":[\\\"التسعير\\\",\\\"الميزانية\\\",\\\"عدد العملاء المتوقع\\\",\\\"المنافسون المحددون\\\",\\\"استعداد العملاء للدفع\\\"]}\"\n}\n\n"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "business",
+                "tools"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/business/tools"
+            }
+          },
+          "response": []
+        }
+      ],
+      "name": "BUSINESS_TOOLs Tsting"
+    },
+    {
+      "item": [
+        {
+          "name": "World Bank API",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "external",
+                "world-bank",
+                "saudi-indicators"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/external/world-bank/saudi-indicators"
+            }
+          },
+          "response": []
+        }
+      ],
+      "name": "externalapi"
+    },
+    {
+      "item": [
+        {
+          "name": "New Request",
+          "request": {
+            "header": [
+              {
+                "disabled": true,
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Sana-Key",
+                "value": "4rcMNMtUmLeYswj"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "sana-thinking-platform",
+                "app",
+                "n8n",
+                "cloud"
+              ],
+              "path": [
+                "webhook",
+                "sana",
+                "ai"
+              ],
+              "protocol": "https",
+              "raw": "https://sana-thinking-platform.app.n8n.cloud/webhook/sana/ai"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add request",
+          "request": {
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "carter-pediatric-tones-relates",
+                "trycloudflare",
+                "com"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "3",
+                "ai",
+                "requests"
+              ],
+              "protocol": "https",
+              "query": [
+                {
+                  "disabled": true,
+                  "key": "X-Sana-Key",
+                  "value": "4rcMNMtUmLeYswj"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "raw": "https://carter-pediatric-tones-relates.trycloudflare.com/api/projects/3/ai/requests?Content-Type=application/json"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test",
+          "request": {
+            "header": [
+              {
+                "key": "X-Sana-Key",
+                "value": "4rcMNMtUmLeYswj"
+              },
+              {
+                "key": "Content-Type",
+                "value": ""
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "sana-thinking-platform",
+                "app",
+                "n8n",
+                "cloud"
+              ],
+              "path": [
+                "webhook-test",
+                "sana",
+                "ai"
+              ],
+              "protocol": "https",
+              "query": [
+                {
+                  "disabled": true,
+                  "key": "",
+                  "value": ""
+                }
+              ],
+              "raw": "https://sana-thinking-platform.app.n8n.cloud/webhook-test/sana/ai"
+            }
+          },
+          "response": []
+        }
+      ],
+      "name": "Webhook api"
+    },
+    {
+      "item": [
+        {
+          "name": "Add diagramType",
+          "request": {
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "5",
+                "ai",
+                "requests"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/projects/5/ai/requests"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get requests",
+          "request": {
+            "auth": {
+              "basic": [
+                {
+                  "key": "username",
+                  "type": "string",
+                  "value": "khalid.business@example.com"
+                },
+                {
+                  "key": "password",
+                  "type": "string",
+                  "value": "{{auth_password_08y3}}"
+                }
+              ],
+              "type": "basic"
+            },
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "5",
+                "ai",
+                "requests",
+                "e6e03b11-0b40-4fe7-a5a9-05220586e43f"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/projects/5/ai/requests/e6e03b11-0b40-4fe7-a5a9-05220586e43f"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "حفظ المخطط والعناصر والعلاقات يدويً",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get project digram",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "اضافة شريحة العملاء",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"type\": \"CUSTOMER_SEGMENT\",\n  \"label\": \"ملاك العقارات\",\n  \"positionX\": 100,\n  \"positionY\": 150,\n  \"data\": {\n    \"description\": \"شريحة مستهدفة بحسب فكرة المشروع، ولم يتم التحقق من احتياجاتها أو استعدادها للدفع.\"\n  }\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "add",
+                "3"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "0"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/node/add/3?expectedRevision=0"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "graph",
+          "request": {
+            "auth": {
+              "basic": [
+                {
+                  "key": "username",
+                  "type": "string",
+                  "value": "khalid.business@example.com"
+                },
+                {
+                  "key": "password",
+                  "type": "string",
+                  "value": "{{auth_password_08y3}}"
+                }
+              ],
+              "type": "basic"
+            },
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "graph",
+                "get",
+                "3"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/v1/diagram/graph/get/3"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "القيمة المقترحة",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ربط القيمة المقترحة",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"type\": \"SERVES\",\n  \"label\": \"تخدم\",\n  \"sourceNodeId\": 2,\n  \"targetNodeId\": 1,\n  \"data\": {\n    \"description\": \"القيمة المقترحة تستهدف خدمة ملاك العقارات، ويحتاج ذلك إلى التحقق مع العملاء.\"\n  }\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "edge",
+                "add",
+                "3"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "2"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/edge/add/3?expectedRevision=2"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "تعديل عنصر مع بقاء العلاقة محفوظة",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"type\": \"SERVES\",\n  \"label\": \"تقدم قيمة إلى\",\n  \"sourceNodeId\": 2,\n  \"targetNodeId\": 1,\n  \"data\": {\n    \"description\": \"القيمة المقترحة تستهدف ملاك العقارات ومديري الأملاك، وتحتاج فائدتها إلى التحقق مع العملاء.\"\n  }\n}"
+            },
+            "header": [],
+            "method": "PUT",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "update",
+                "3",
+                "1"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "3"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/node/update/3/1?expectedRevision=3"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "رفض التعديل باستخدام إصدار قديم",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "رفض نوع عنصر غير مسموح في نموذج العمل التجاري",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"type\": \"SWOT_STRENGTH\",\n  \"label\": \"عنصر غير متوافق للاختبار\",\n  \"positionX\": 700,\n  \"positionY\": 150,\n  \"data\": {\n    \"description\": \"اختبار رفض عنصر SWOT داخل مخطط نموذج العمل التجاري.\"\n  }\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "add",
+                "3"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "4"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/node/add/3?expectedRevision=4"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "تحديث العلاقة",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"type\": \"SERVES\",\n  \"label\": \"تقدم قيمة إلى\",\n  \"sourceNodeId\": 2,\n  \"targetNodeId\": 1,\n  \"data\": {\n    \"description\": \"القيمة المقترحة تستهدف ملاك العقارات ومديري الأملاك، وتحتاج فائدتها إلى التحقق مع العملاء.\"\n  }\n}"
+            },
+            "header": [],
+            "method": "PUT",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "edge",
+                "update",
+                "3",
+                "1"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "4"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/edge/update/3/1?expectedRevision=4"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"type\": \"CHANNELS\",\n  \"label\": \"عنصر مؤقت لاختبار الحذف\",\n  \"positionX\": 700,\n  \"positionY\": 150,\n  \"data\": {\n    \"description\": \"عنصر تجريبي سيُحذف بعد التحقق من إضافته.\"\n  }\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "add",
+                "3"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "5"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/node/add/3?expectedRevision=5"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "auth": {
+              "basic": [
+                {
+                  "key": "username",
+                  "type": "string",
+                  "value": "khalid.business@example.com"
+                },
+                {
+                  "key": "password",
+                  "type": "string",
+                  "value": "{{auth_password_08y3}}"
+                }
+              ],
+              "type": "basic"
+            },
+            "header": [],
+            "method": "DELETE",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "node",
+                "delete",
+                "3",
+                "3"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "6"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/node/delete/3/3?expectedRevision=6"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"type\": \"SERVES\",\n  \"label\": \"علاقة اختبار\",\n  \"sourceNodeId\": 2,\n  \"targetNodeId\": 3,\n  \"data\": {\n    \"description\": \"اختبار رفض علاقة تستهدف العنصر الذي حذفناه.\"\n  }\n}"
+            },
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "diagram",
+                "edge",
+                "add",
+                "3"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "query": [
+                {
+                  "key": "expectedRevision",
+                  "value": "7"
+                }
+              ],
+              "raw": "http://localhost:8080/api/v1/diagram/edge/add/3?expectedRevision=7"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test Authorization",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "auth me",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        }
+      ],
+      "name": "Test requests ai"
+    },
+    {
+      "item": [
+        {
+          "name": "Get plan",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "billing",
+                "plans"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/billing/plans"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "billing me",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "checkout",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "recept",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Order",
+          "request": {
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "billing",
+                "orders"
+              ],
+              "port": "8080",
+              "protocol": "http",
+              "raw": "http://localhost:8080/api/billing/orders"
+            }
+          },
+          "response": []
+        }
+      ],
+      "name": "Test Pyment"
+    },
+    {
+      "name": "requests",
+      "request": {
+        "header": [],
+        "method": "GET",
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Test email",
+      "request": {
+        "header": [],
+        "method": "GET",
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    }
+  ]
+}
